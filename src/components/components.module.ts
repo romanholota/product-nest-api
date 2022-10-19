@@ -9,6 +9,7 @@ import { ComponentsController } from './components.controller';
         SequelizeModule.forFeature([Component])
     ],
     providers: [ComponentsService],
-    controllers: [ComponentsController]
+    controllers: [ComponentsController],
+    exports: [ComponentsService]
 })
 export class ComponentsModule {}

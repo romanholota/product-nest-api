@@ -14,20 +14,25 @@ import { ComponentType } from './component-types/component-type.model';
 import { Component } from './components/component.model';
 import { ProductComponent } from './product-components/product-component.model';
 import { Product } from './products/product.model';
+import { ItemsModule } from './items/items.module';
+import { Item } from './items/item.model';
 
 @Module({
   imports: [
     SequelizeModule.forRoot({
       dialect: 'sqlite',
       storage: 'database.db',
-      models: [ComponentAttributeType, ComponentAttribute, ComponentType, Component, ProductComponent, Product],
+      synchronize: true,
+      autoLoadModels: true,
+      models: [ComponentAttributeType, ComponentAttribute, ComponentType, Component, ProductComponent, Product, Item],
     }),
     ProductsModule,
     ProductComponentsModule,
     ComponentsModule,
     ComponentAttributesModule,
     ComponentAttributeTypesModule,
-    ComponentTypesModule
+    ComponentTypesModule,
+    ItemsModule
   ],
   controllers: [AppController],
   providers: [AppService],
