@@ -15,7 +15,15 @@ export class Item extends Model {
 	@Column
 	partNumber: string;
 
-	@Column(DataTypes.JSON)
+	@Column({
+		type: DataTypes.TEXT,
+		get(this: Item) {
+			return JSON.parse(this.getDataValue('specs'))
+		},
+		set(this: Item, value: any) {
+			this.setDataValue('specs', JSON.stringify(value))
+		}
+	})
 	specs: string;
 
 

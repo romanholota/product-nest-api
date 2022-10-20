@@ -2,7 +2,8 @@ import { Controller, Delete, Get, Post, Query, UploadedFile, UseInterceptors } f
 import { ItemsService } from './items.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
-import { Op } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
+import { toLower as _toLower } from 'lodash';
 
 @Controller('items')
 export class ItemsController {
@@ -14,17 +15,18 @@ export class ItemsController {
 		return this.itemsService.findAll({
 			where: {
 				[Op.or]: [
-					{
-						name: {
-							[Op.iLike]: `%${search || ''}%`
+					Sequelize.where(
+						Sequelize.fn('lower', Sequelize.col('name')),
+						{
+							[Op.like]: `%${_toLower(search)}%`
 						}
-					},
-					{
-						partNumber: {
-							[Op.iLike]: `%${search || ''}%`
+					),
+					Sequelize.where(
+						Sequelize.fn('lower', Sequelize.col('partNumber')),
+						{
+							[Op.like]: `%${_toLower(search)}%`
 						}
-					}
-
+					)
 				]
 			},
 			limit: 20
