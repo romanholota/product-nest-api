@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import * as xlsx from 'node-xlsx';
-import { map as _map, zipObject as _zipObject } from 'lodash';
+import { map as _map, zipObject as _zipObject, get as _get } from 'lodash';
 import { Item } from './item.model';
 import { InjectModel } from '@nestjs/sequelize';
+import { FindOptions } from 'sequelize';
 
 @Injectable()
 export class ItemsService {
@@ -13,6 +14,14 @@ export class ItemsService {
 	) {
 	}
 
+	findAll(query?: FindOptions) {
+		return this.itemModel.findAll(query);
+	}
+
+	destroy() {
+		return this.itemModel.destroy({truncate: true});
+	}
+
 	async parseXls(file) {
 		const sheet: any = xlsx.parse(file.buffer)[0]['data'];
 		const header = sheet[0];
@@ -21,7 +30,9 @@ export class ItemsService {
 
 		for (const parsedProduct of parsedProducts) {
 			await this.itemModel.create({
-				specs: JSON.stringify(parsedProduct)
+				name: _get(parsedProduct, 'Product'),
+				partNumber: _get(parsedProduct, 'Model'),
+				specs: parsedProduct
 			});
 		}
 

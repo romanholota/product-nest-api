@@ -16,25 +16,35 @@ import { ProductComponent } from './product-components/product-component.model';
 import { Product } from './products/product.model';
 import { ItemsModule } from './items/items.module';
 import { Item } from './items/item.model';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
-  imports: [
-    SequelizeModule.forRoot({
-      dialect: 'sqlite',
-      storage: 'database.db',
-      synchronize: true,
-      autoLoadModels: true,
-      models: [ComponentAttributeType, ComponentAttribute, ComponentType, Component, ProductComponent, Product, Item],
-    }),
-    ProductsModule,
-    ProductComponentsModule,
-    ComponentsModule,
-    ComponentAttributesModule,
-    ComponentAttributeTypesModule,
-    ComponentTypesModule,
-    ItemsModule
-  ],
-  controllers: [AppController],
-  providers: [AppService],
+	imports: [
+		ConfigModule.forRoot(),
+		SequelizeModule.forRootAsync({
+			imports: [ConfigModule],
+			inject: [ConfigService],
+			useFactory: (configService: ConfigService) => ({
+				dialect: 'postgres',
+				host: configService.get('DB_HOST'),
+				port: configService.get('DB_PORT'),
+				username: configService.get('DB_USER'),
+				password: configService.get('DB_PASS'),
+				database: configService.get('DB_NAME'),
+				autoLoadModels: true,
+				synchronize: true,
+				models: [ComponentAttributeType, ComponentAttribute, ComponentType, Component, ProductComponent, Product, Item],
+			})
+		}),
+		ProductsModule,
+		ProductComponentsModule,
+		ComponentsModule,
+		ComponentAttributesModule,
+		ComponentAttributeTypesModule,
+		ComponentTypesModule,
+		ItemsModule
+	],
+	controllers: [AppController],
+	providers: [AppService],
 })
 export class AppModule {}

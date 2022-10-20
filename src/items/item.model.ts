@@ -12,7 +12,11 @@ export class Item extends Model {
 	@Column
 	name: string;
 
+	@Column
+	partNumber: string;
+
 	@Column(DataTypes.JSON)
 	specs: string;
+
 
 }
