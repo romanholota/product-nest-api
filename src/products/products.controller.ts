@@ -1,12 +1,9 @@
-import { Body, Controller, Get, Param, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { ProductComponent } from '../product-components/product-component.model';
-import { Component } from '../components/component.model';
-import { ComponentAttribute } from '../component-attributes/component-attribute.model';
-import { ComponentAttributeType } from '../component-attribute-types/component-attribute-type.model';
-import { ComponentType } from '../component-types/component-type.model';
 import { Express } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Op, Sequelize } from 'sequelize';
+import { toLower as _toLower } from 'lodash';
 
 @Controller('products')
 export class ProductsController {
@@ -17,41 +14,32 @@ export class ProductsController {
 	}
 
 	@Get('index')
-	findAll() {
-		return this.productsService.findAll();
-	}
-
-	@Post('create')
-	create(@Body() data: any) {
-		return this.productsService.create(data);
-	}
-
-	@Get('edit/:id')
-	edit(@Param('id') id: string) {
-		return this.productsService.findOne({
+	findAll(@Query('search') search: string) {
+		return this.productsService.findAll({
 			where: {
-				id: id
-			},
-			include: [
-				{
-					model: ProductComponent,
-					include: [
+				[Op.or]: [
+					Sequelize.where(
+						Sequelize.fn('lower', Sequelize.col('name')),
 						{
-							model: Component,
-							include: [
-								{
-									model: ComponentAttribute,
-									include: [
-										ComponentAttributeType
-									]
-								},
-								ComponentType
-							]
+							[Op.like]: `%${_toLower(search)}%`
 						}
-					]
-				}
-			]
+					),
+					Sequelize.where(
+						Sequelize.fn('lower', Sequelize.col('partNumber')),
+						{
+							[Op.like]: `%${_toLower(search)}%`
+						}
+					)
+				]
+			},
+			limit: 20
 		});
+	}
+
+	@Post('upload')
+	@UseInterceptors(FileInterceptor('file'))
+	uploadFile(@UploadedFile() file: Express.Multer.File) {
+		return this.productsService.parseXls(file);
 	}
 
 
