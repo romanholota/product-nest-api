@@ -4,7 +4,6 @@ import { Product } from './product.model';
 import { FindOptions } from 'sequelize';
 import { get as _get, map as _map, zipObject as _zipObject, toLower as _toLower } from 'lodash';
 import * as xlsx from 'node-xlsx';
-import { ProductComponent } from '../product-components/product-component.model';
 import { ProductComponentType } from '../product-component-types/product-component-type.model';
 import { ProductComponentTypeNamesService } from '../product-component-type-names/product-component-type-names.service';
 
@@ -16,6 +15,10 @@ export class ProductsService {
 		private productModel: typeof Product,
 		private productComponentTypeNamesService: ProductComponentTypeNamesService
 	) {
+	}
+
+	findOne(query?: FindOptions) {
+		return this.productModel.findOne(query);
 	}
 
 	findAll(query?: FindOptions) {

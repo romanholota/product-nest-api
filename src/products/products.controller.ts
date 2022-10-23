@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { Express } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -33,6 +33,15 @@ export class ProductsController {
 				]
 			},
 			limit: 20
+		});
+	}
+
+	@Get('detail/:id')
+	findOne(@Param('id') id: string) {
+		return this.productsService.findOne({
+			where: {
+				id: id
+			}
 		});
 	}
 
