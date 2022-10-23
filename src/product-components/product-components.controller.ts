@@ -9,9 +9,4 @@ export class ProductComponentsController {
 	) {
 	}
 
-	@Post('create')
-	create(@Body() data: any) {
-		return this.productComponentsService.create(data);
-	}
-
 }

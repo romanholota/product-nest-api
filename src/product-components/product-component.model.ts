@@ -1,6 +1,6 @@
 import { Table, Column, Model, ForeignKey, PrimaryKey, AutoIncrement, BelongsTo } from 'sequelize-typescript';
-import { Component } from 'src/components/component.model';
-import { Product } from 'src/products/product.model';
+import { ProductComponentType } from '../product-component-types/product-component-type.model';
+import { Product } from '../products/product.model';
 
 @Table
 export class ProductComponent extends Model {
@@ -13,18 +13,21 @@ export class ProductComponent extends Model {
 	@Column
 	name: string;
 
-    @ForeignKey(() => Product)
+	@Column
+	value: string;
+
+	@ForeignKey(() => Product)
+	@Column
+	productId: number;
+
+    @ForeignKey(() => ProductComponentType)
     @Column
-    productId: number;
+    productComponentTypeId: number;
 
-    @ForeignKey(() => Component)
-    @Column
-    componentId: number;
+	@BelongsTo(() => Product)
+	product: Product;
 
-    @BelongsTo(() => Product)
-    product: Product;
-
-    @BelongsTo(() => Component)
-    component: Component;
+    @BelongsTo(() => ProductComponentType)
+    productComponentType: ProductComponentType;
 
 }
