@@ -3,6 +3,7 @@ import { CreateProductComponentTypeDto } from './dto/create-product-component-ty
 import { UpdateProductComponentTypeDto } from './dto/update-product-component-type.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { ProductComponentType } from './product-component-type.model';
+import { FindOptions } from 'sequelize';
 
 @Injectable()
 export class ProductComponentTypesService {
@@ -13,8 +14,8 @@ export class ProductComponentTypesService {
   ) {
   }
 
-  findAll() {
-    return this.productComponentTypeModel.findAll();
+  findAll(query?: FindOptions) {
+    return this.productComponentTypeModel.findAll(query);
   }
 
 }

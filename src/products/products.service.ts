@@ -25,10 +25,38 @@ export class ProductsService {
 		return this.productModel.findAll(query);
 	}
 
-	async parseXls(file) {
+	async parseXlsx(file, categoryId: number) {
 		const sheet: any = xlsx.parse(file.buffer)[0]['data'];
 		const header = sheet[0];
+		const componentNameMap = {};
 		const data = sheet.splice(1);
+
+		for (const key of header) {
+
+			const productComponentTypeName = await this.productComponentTypeNamesService.findOne({
+				attributes: ['id'],
+				where: {
+					name: _toLower(key)
+				},
+				include: [
+					{
+						model: ProductComponentType,
+						attributes: ['key'],
+						where: {
+							productCategoryId: categoryId
+						}
+					}
+				]
+			});
+
+			if (!productComponentTypeName?.productComponentType?.key) {
+				continue;
+			}
+
+			componentNameMap[key] = productComponentTypeName.productComponentType.key;
+
+		}
+
 		const parsedProducts = _map(data, row => _zipObject(header, row));
 
 		for (const parsedProduct of parsedProducts) {
@@ -37,30 +65,25 @@ export class ProductsService {
 				continue;
 			}
 
-			const product = await this.productModel.create({
-				name: _get(parsedProduct, 'Product'),
-				partNumber: _get(parsedProduct, 'Model'),
+			const [product, created] = await this.productModel.findOrCreate({
+				where: {
+					partNumber: _get(parsedProduct, 'Model'),
+				},
+				defaults: {
+					name: _get(parsedProduct, 'Product'),
+					productCategoryId: categoryId
+				}
 			});
+
+			if (!created) {
+				continue;
+			}
 
 			const specs: any = {};
 
 			for (const [key, value] of Object.entries(parsedProduct)) {
 
-				const productComponentTypeName = await this.productComponentTypeNamesService.findOne({
-					attributes: ['id'],
-					where: {
-						name: _toLower(key)
-					},
-					include: [
-						ProductComponentType
-					]
-				});
-
-				if (!productComponentTypeName?.productComponentType?.key) {
-					continue;
-				}
-
-				specs[productComponentTypeName.productComponentType.key] = value;
+				if (componentNameMap[key]) specs[componentNameMap[key]] = value;
 
 			}
 

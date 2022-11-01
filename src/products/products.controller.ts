@@ -4,6 +4,7 @@ import { Express } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Op, Sequelize } from 'sequelize';
 import { toLower as _toLower } from 'lodash';
+import { ProductCategory } from '../product-categories/product-category.model';
 
 @Controller('products')
 export class ProductsController {
@@ -13,25 +14,33 @@ export class ProductsController {
 	) {
 	}
 
-	@Get('index')
-	findAll(@Query('search') search: string) {
+	@Get('index/:categorySlug')
+	findAll(@Query('search') search: string, @Param('categorySlug') categorySlug: string) {
 		return this.productsService.findAll({
 			where: {
 				[Op.or]: [
 					Sequelize.where(
-						Sequelize.fn('lower', Sequelize.col('name')),
+						Sequelize.fn('lower', Sequelize.col('Product.name')),
 						{
 							[Op.like]: `%${_toLower(search)}%`
 						}
 					),
 					Sequelize.where(
-						Sequelize.fn('lower', Sequelize.col('partNumber')),
+						Sequelize.fn('lower', Sequelize.col('Product.partNumber')),
 						{
 							[Op.like]: `%${_toLower(search)}%`
 						}
 					)
 				]
 			},
+			include: [
+				{
+					model: ProductCategory,
+					where: {
+						name: categorySlug
+					}
+				}
+			],
 			limit: 20
 		});
 	}
@@ -45,10 +54,10 @@ export class ProductsController {
 		});
 	}
 
-	@Post('upload')
+	@Post('upload/xlsx/:categoryId')
 	@UseInterceptors(FileInterceptor('file'))
-	uploadFile(@UploadedFile() file: Express.Multer.File) {
-		return this.productsService.parseXls(file);
+	uploadFile(@UploadedFile() file: Express.Multer.File, @Param('categoryId') categoryId: string) {
+		return this.productsService.parseXlsx(file, +categoryId);
 	}
 
 

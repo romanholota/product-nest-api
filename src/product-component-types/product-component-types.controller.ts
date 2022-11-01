@@ -1,13 +1,23 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { ProductComponentTypesService } from './product-component-types.service';
+import { ProductCategory } from '../product-categories/product-category.model';
 
 @Controller('product-component-types')
 export class ProductComponentTypesController {
   constructor(private readonly productComponentTypesService: ProductComponentTypesService) {}
 
-  @Get('index')
-  findAll() {
-    return this.productComponentTypesService.findAll();
+  @Get('index/:categorySlug')
+  findAll(@Param('categorySlug') categorySlug: string) {
+    return this.productComponentTypesService.findAll({
+      include: [
+        {
+          model: ProductCategory,
+          where: {
+            name: categorySlug
+          }
+        }
+      ]
+    });
   }
 
 }

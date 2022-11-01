@@ -1,6 +1,6 @@
-import { Table, Column, Model, PrimaryKey, AutoIncrement, HasMany } from 'sequelize-typescript';
-import { ProductComponent } from 'src/product-components/product-component.model';
+import { Table, Column, Model, PrimaryKey, AutoIncrement, BelongsTo, ForeignKey } from 'sequelize-typescript';
 import { DataTypes } from 'sequelize';
+import { ProductCategory } from '../product-categories/product-category.model';
 
 @Table
 export class Product extends Model {
@@ -27,7 +27,11 @@ export class Product extends Model {
 	})
 	specs: string;
 
-    @HasMany(() => ProductComponent)
-    productComponents: ProductComponent[]
+	@ForeignKey(() => ProductCategory)
+	@Column
+	productCategoryId: number;
+
+	@BelongsTo(() => ProductCategory)
+	productCategory: ProductCategory
 
 }
