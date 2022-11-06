@@ -6,7 +6,7 @@ import { Op, Sequelize } from 'sequelize';
 import { toLower as _toLower } from 'lodash';
 import { ProductCategory } from '../product-categories/product-category.model';
 
-@Controller('products')
+@Controller()
 export class ProductsController {
 
 	constructor(

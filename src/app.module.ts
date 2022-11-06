@@ -13,9 +13,29 @@ import { ProductComponentType } from './product-component-types/product-componen
 import { ProductComponentTypeName } from './product-component-type-names/product-component-type-name.model';
 import { ProductCategoriesModule } from './product-categories/product-categories.module';
 import { ProductCategory } from './product-categories/product-category.model';
+import { RouterModule } from '@nestjs/core';
 
 @Module({
 	imports: [
+		RouterModule.register([
+			{
+				path: 'app',
+				children: [
+					{
+						path: 'products',
+						module: ProductsModule,
+					},
+					{
+						path: 'product-component-types',
+						module: ProductComponentTypesModule
+					},
+					{
+						path: 'product-categories',
+						module: ProductCategoriesModule
+					}
+				]
+			}
+		]),
 		ConfigModule.forRoot(),
 		SequelizeModule.forRootAsync({
 			imports: [ConfigModule],
