@@ -19,7 +19,7 @@ export class Product extends Model {
 	@Column({
 		type: DataTypes.TEXT,
 		get(this: Product) {
-			return JSON.parse(this.getDataValue('specs'))
+			return this.getDataValue('specs') ? JSON.parse(this.getDataValue('specs')) : null;
 		},
 		set(this: Product, value: any) {
 			this.setDataValue('specs', JSON.stringify(value))

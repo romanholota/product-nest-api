@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Product } from './product.model';
-import { FindOptions } from 'sequelize';
+import { FindOptions, UpdateOptions } from 'sequelize';
 import { get as _get, map as _map, zipObject as _zipObject, toLower as _toLower } from 'lodash';
 import * as xlsx from 'node-xlsx';
 import { ProductComponentType } from '../product-component-types/product-component-type.model';
@@ -94,4 +94,7 @@ export class ProductsService {
 
 	}
 
+	update(values: any, options: UpdateOptions) {
+		return this.productModel.update(values, options);
+	}
 }

@@ -20,4 +20,18 @@ export class ProductComponentTypesController {
     });
   }
 
+  @Get('admin/index/:categoryId')
+  findAllAdmin(@Param('categoryId') categoryId: string) {
+    return this.productComponentTypesService.findAll({
+      include: [
+        {
+          model: ProductCategory,
+          where: {
+            id: categoryId
+          }
+        }
+      ]
+    });
+  }
+
 }
